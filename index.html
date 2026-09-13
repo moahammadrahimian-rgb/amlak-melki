@@ -1,0 +1,9 @@
+<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8">
+<title>پنل مدیریت املاک ملکی</title>
+<style>body{font-family:sans-serif;max-width:1000px;margin:30px auto;padding:10px}button{padding:10px;margin:4px}.card{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:10px}</style>
+<h1>پنل مدیریت املاک ملکی</h1>
+<p>توکن مدیر را وارد کنید:</p><input id="token" style="width:80%;padding:10px"><button onclick="load()">دریافت آگهی‌ها</button><div id="list"></div>
+<script>
+async function load(){let t=document.getElementById('token').value,r=await fetch('/api/admin/properties',{headers:{Authorization:'Bearer '+t}}),d=await r.json();let el=document.getElementById('list');el.innerHTML=(d.properties||[]).map(p=>`<div class="card"><b>${p.title}</b><br>${p.city} — ${p.type} — وضعیت: ${p.status}<br><button onclick="act('${p.id}','approve')">تایید</button><button onclick="act('${p.id}','reject')">رد</button></div>`).join('')}
+async function act(id,a){let t=document.getElementById('token').value;await fetch('/api/properties/'+id+'/'+a,{method:'POST',headers:{Authorization:'Bearer '+t}});load()}
+</script></html>

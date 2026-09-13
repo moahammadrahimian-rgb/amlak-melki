@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: amlak
+      POSTGRES_USER: amlak
+      POSTGRES_PASSWORD: CHANGE_ME
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./backend_pg:/app
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      JWT_SECRET: CHANGE_ME_LONG_RANDOM_SECRET
+      DATABASE_URL: postgres://amlak:CHANGE_ME@postgres:5432/amlak
+    depends_on:
+      - postgres
+    command: sh -c "npm install && node -e \"const fs=require('fs'); const {Client}=require('pg'); const c=new Client({connectionString:process.env.DATABASE_URL}); c.connect().then(()=>c.query(fs.readFileSync('schema.sql','utf8'))).then(()=>c.end()).then(()=>require('./src/server.js'))"
+volumes:
+  pgdata:
